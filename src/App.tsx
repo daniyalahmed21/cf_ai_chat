@@ -38,7 +38,12 @@ function App() {
         body: JSON.stringify({ message })
       })
 
+      console.log('Response status:', response.status)
+      console.log('Response ok:', response.ok)
+
       if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Error response:', errorText)
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
@@ -46,15 +51,21 @@ function App() {
       const decoder = new TextDecoder()
       let fullText = ''
 
+      console.log('Reader available:', !!reader)
+
       if (reader) {
         setIsTyping(false)
         setMessages(prev => [...prev, { content: '', isUser: false }])
 
         while (true) {
           const { done, value } = await reader.read()
-          if (done) break
+          if (done) {
+            console.log('Stream complete, final text:', fullText)
+            break
+          }
 
           const chunk = decoder.decode(value, { stream: true })
+          console.log('Received chunk:', chunk)
           fullText += chunk
 
           setMessages(prev => {
@@ -65,7 +76,7 @@ function App() {
         }
       }
     } catch (error) {
-      console.error('Error:', error)
+      console.error('Error details:', error)
       setIsTyping(false)
       setMessages(prev => [...prev, {
         content: 'Sorry, there was an error processing your message. Please try again.',
