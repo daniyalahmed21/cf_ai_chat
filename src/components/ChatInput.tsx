@@ -24,23 +24,23 @@ function ChatInput({ onSend, disabled }: ChatInputProps) {
   }
 
   return (
-    <div className="border-t border-gray-200 p-4 bg-white">
-      <div className="flex gap-3">
+    <div className="border-t border-gray-200 p-6 bg-gradient-to-r from-white to-gray-50">
+      <div className="flex gap-4">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
           disabled={disabled}
-          placeholder="Type your message..."
-          className="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-cloudflare-orange focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
+          placeholder="Ask me anything..."
+          className="flex-1 px-6 py-4 border-2 border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed transition-all text-base shadow-sm hover:shadow-md"
         />
         <button
           onClick={handleSend}
           disabled={disabled || !input.trim()}
-          className="bg-cloudflare-orange text-white px-6 py-3 rounded-full font-semibold hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:shadow-lg active:scale-95"
+          className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-8 py-4 rounded-2xl font-semibold hover:from-orange-600 hover:to-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:shadow-xl active:scale-95 shadow-lg"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
           </svg>
         </button>

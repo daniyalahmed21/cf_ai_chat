@@ -10,28 +10,28 @@ interface ChatMessageProps {
 
 function ChatMessage({ content, isUser }: ChatMessageProps) {
   return (
-    <div className={`flex items-start gap-3 ${isUser ? 'flex-row-reverse' : ''}`}>
-      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0 ${
-        isUser ? 'bg-gray-700' : 'bg-cloudflare-orange'
+    <div className={`flex items-start gap-4 ${isUser ? 'flex-row-reverse' : ''}`}>
+      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg ${
+        isUser
+          ? 'bg-gradient-to-br from-slate-600 to-slate-700'
+          : 'bg-gradient-to-br from-orange-500 to-orange-600'
       }`}>
         {isUser ? (
-          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+          <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
           </svg>
         ) : (
-          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
-          </svg>
+          <img src="/image.png" alt="AI" className="w-8 h-8 object-contain" />
         )}
       </div>
 
-      <div className={`max-w-[70%] rounded-2xl px-4 py-3 ${
+      <div className={`max-w-[75%] rounded-2xl px-6 py-4 shadow-md transition-all hover:shadow-lg ${
         isUser
-          ? 'bg-cloudflare-orange text-white'
-          : 'bg-gray-100 text-gray-800'
+          ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white'
+          : 'bg-gradient-to-r from-gray-50 to-white text-gray-800 border border-gray-200'
       }`}>
         {isUser ? (
-          <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">{content}</p>
+          <p className="text-base leading-relaxed whitespace-pre-wrap break-words">{content}</p>
         ) : (
           <div className="text-sm leading-relaxed prose prose-sm max-w-none">
             <ReactMarkdown
@@ -40,7 +40,7 @@ function ChatMessage({ content, isUser }: ChatMessageProps) {
               components={{
                 code: ({ node, inline, className, children, ...props }: any) => {
                   return inline ? (
-                    <code className="bg-gray-200 text-gray-800 px-1 py-0.5 rounded text-xs font-mono" {...props}>
+                    <code className="bg-orange-100 text-orange-800 px-2 py-0.5 rounded font-mono text-xs font-semibold" {...props}>
                       {children}
                     </code>
                   ) : (
@@ -50,7 +50,7 @@ function ChatMessage({ content, isUser }: ChatMessageProps) {
                   )
                 },
                 pre: ({ children }: any) => (
-                  <pre className="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto my-2">
+                  <pre className="bg-slate-900 text-white p-5 rounded-xl overflow-x-auto my-3 shadow-lg border border-slate-700">
                     {children}
                   </pre>
                 ),
@@ -76,12 +76,12 @@ function ChatMessage({ content, isUser }: ChatMessageProps) {
                   <h3 className="text-base font-bold mb-2 mt-2 first:mt-0">{children}</h3>
                 ),
                 blockquote: ({ children }: any) => (
-                  <blockquote className="border-l-4 border-cloudflare-orange pl-4 italic my-2">
+                  <blockquote className="border-l-4 border-orange-500 pl-4 italic my-3 bg-orange-50 py-2 rounded-r-lg">
                     {children}
                   </blockquote>
                 ),
                 a: ({ children, href }: any) => (
-                  <a href={href} className="text-cloudflare-orange hover:underline" target="_blank" rel="noopener noreferrer">
+                  <a href={href} className="text-orange-600 hover:text-orange-700 hover:underline font-medium transition-colors" target="_blank" rel="noopener noreferrer">
                     {children}
                   </a>
                 ),
