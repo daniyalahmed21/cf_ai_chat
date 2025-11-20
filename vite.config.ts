@@ -6,17 +6,4 @@ export default defineConfig({
   server: {
     port: 3000,
   },
-  build: {
-    rollupOptions: {
-      output: {
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name === 'image.png') {
-            return '[name][extname]'
-          }
-          return 'assets/[name]-[hash][extname]'
-        }
-      }
-    }
-  },
-  publicDir: 'public'
 })
