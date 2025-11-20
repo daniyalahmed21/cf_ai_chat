@@ -14,18 +14,27 @@ export async function getAIStream(
   const encoder = new TextEncoder();
 
   const finalTextPromise = (async () => {
-    for await (const chunk of stream) {
-      const text = chunk.response || '';
-      fullText += text;
-      await writer.write(encoder.encode(text));
+    try {
+      if (stream && typeof stream[Symbol.asyncIterator] === 'function') {
+        for await (const chunk of stream) {
+          const text = chunk?.response || chunk?.text || '';
+          if (text) {
+            fullText += text;
+            await writer.write(encoder.encode(text));
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Stream error:', error);
+    } finally {
+      await writer.close();
     }
-    await writer.close();
     return fullText;
   })();
 
   const streamResponse = new Response(readable, {
     headers: {
-      'Content-Type': 'text/plain',
+      'Content-Type': 'text/plain; charset=utf-8',
       'Transfer-Encoding': 'chunked',
     },
   });
