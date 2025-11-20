@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react'
 import ChatMessage from './components/ChatMessage'
 import ChatInput from './components/ChatInput'
 import ChatHeader from './components/ChatHeader'
-import { messageService } from './lib/supabase'
 
 interface Message {
   content: string
@@ -10,41 +9,20 @@ interface Message {
 }
 
 function App() {
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<Message[]>(() => {
+    const saved = localStorage.getItem('chat_messages')
+    if (saved) {
+      return JSON.parse(saved)
+    }
+    return [{ content: "Hello! I'm your AI assistant powered by Cloudflare Workers AI. How can I help you today?", isUser: false }]
+  })
   const [isTyping, setIsTyping] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const userIdRef = useRef<string>('')
+  const userId = useRef(`user-${Math.random().toString(36).substr(2, 9)}`)
 
   useEffect(() => {
-    const initializeChat = async () => {
-      let userId = localStorage.getItem('chat_user_id')
-      if (!userId) {
-        userId = `user-${Math.random().toString(36).substr(2, 9)}`
-        localStorage.setItem('chat_user_id', userId)
-      }
-      userIdRef.current = userId
-
-      const loadedMessages = await messageService.loadMessages(userId)
-      if (loadedMessages.length > 0) {
-        setMessages(loadedMessages.map(msg => ({
-          content: msg.content,
-          isUser: msg.is_user
-        })))
-      } else {
-        const welcomeMessage = { content: "Hello! I'm your AI assistant powered by Cloudflare Workers AI. How can I help you today?", isUser: false }
-        setMessages([welcomeMessage])
-        await messageService.saveMessage({
-          user_id: userId,
-          content: welcomeMessage.content,
-          is_user: false
-        })
-      }
-      setIsLoading(false)
-    }
-
-    initializeChat()
-  }, [])
+    localStorage.setItem('chat_messages', JSON.stringify(messages))
+  }, [messages])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -55,22 +33,15 @@ function App() {
   }, [messages, isTyping])
 
   const sendMessage = async (message: string) => {
-    const userMessage = { content: message, isUser: true }
-    setMessages(prev => [...prev, userMessage])
+    setMessages(prev => [...prev, { content: message, isUser: true }])
     setIsTyping(true)
-
-    await messageService.saveMessage({
-      user_id: userIdRef.current,
-      content: message,
-      is_user: true
-    })
 
     try {
       const response = await fetch('/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': userIdRef.current
+          'x-user-id': userId.current
         },
         body: JSON.stringify({ message })
       })
@@ -98,11 +69,6 @@ function App() {
           const { done, value } = await reader.read()
           if (done) {
             console.log('Stream complete, final text:', fullText)
-            await messageService.saveMessage({
-              user_id: userIdRef.current,
-              content: fullText,
-              is_user: false
-            })
             break
           }
 
@@ -120,25 +86,11 @@ function App() {
     } catch (error) {
       console.error('Error details:', error)
       setIsTyping(false)
-      const errorMessage = {
+      setMessages(prev => [...prev, {
         content: 'Sorry, there was an error processing your message. Please try again.',
         isUser: false
-      }
-      setMessages(prev => [...prev, errorMessage])
-      await messageService.saveMessage({
-        user_id: userIdRef.current,
-        content: errorMessage.content,
-        is_user: false
-      })
+      }])
     }
-  }
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading chat...</div>
-      </div>
-    )
   }
 
   return (
