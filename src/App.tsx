@@ -22,7 +22,8 @@ function App() {
   const userId = useRef(`user-${Math.random().toString(36).substr(2, 9)}`)
 
   useEffect(() => {
-    localStorage.setItem('chat_messages', JSON.stringify(messages))
+    const validMessages = messages.filter(msg => msg.content.trim() !== '')
+    localStorage.setItem('chat_messages', JSON.stringify(validMessages))
   }, [messages])
 
   const scrollToBottom = () => {
@@ -97,7 +98,7 @@ function App() {
       <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
         <div className="w-full max-w-5xl h-[calc(100vh-140px)] bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-200">
           <div className="flex-1 overflow-y-auto p-8 space-y-6">
-            {messages.map((msg, index) => (
+            {messages.filter(msg => msg.content.trim() !== '').map((msg, index) => (
               <ChatMessage key={index} content={msg.content} isUser={msg.isUser} />
             ))}
 
