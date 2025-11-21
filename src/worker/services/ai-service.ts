@@ -1,3 +1,5 @@
+import { streamText, generateText } from 'ai';
+import { createWorkersAI } from 'workers-ai-provider';
 import { buildPrompt, flattenPrompt } from '../utils/promptBuilder';
 import { AI_MODEL, SUMMARY_PROMPT } from '../config/aiConfig';
 
@@ -8,27 +10,33 @@ export class AIService {
     const messages = buildPrompt(history, message, summary);
     const prompt = flattenPrompt(messages);
 
-    const response = await this.env.AI.run(AI_MODEL, {
-      prompt,
-      stream: true,
-    });
+    const workers = createWorkersAI({ binding: this.env.AI });
 
-    return response;
+    return streamText({
+      model: workers(AI_MODEL),
+      prompt,
+    });
   }
 
   async generateSummary(messages: string[]): Promise<string> {
-    const response = await this.env.AI.run(AI_MODEL, {
+    const workers = createWorkersAI({ binding: this.env.AI });
+
+    const text = await generateText({
+      model: workers(AI_MODEL),
       prompt: SUMMARY_PROMPT + messages.join('\n'),
     });
 
-    return response.response || '';
+    return text.text;
   }
 
   async getAIResponse(prompt: string): Promise<string> {
-    const response = await this.env.AI.run(AI_MODEL, {
+    const workers = createWorkersAI({ binding: this.env.AI });
+
+    const result = await generateText({
+      model: workers(AI_MODEL),
       prompt,
     });
 
-    return response.response || '';
+    return result.text;
   }
 }

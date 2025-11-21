@@ -23,10 +23,13 @@
 			"new_classes": ["ChatHistory"]
 		}
 	],
-	"assets": {
-		"directory": "./dist",
-		"binding": "ASSETS"
-	},
+	"rules": [
+		{
+			"type": "Text",
+			"globs": ["**/*.html"],
+			"fallthrough": true
+		}
+	],
 	"ratelimits": [
 		{
 			"name": "MY_RATE_LIMITER",

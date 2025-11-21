@@ -1,4 +1,5 @@
 import { handleChatPOST } from './routes';
+import indexHtml from '../../public/index.html';
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
@@ -25,6 +26,14 @@ export default {
     };
 
     try {
+      if (url.pathname === '/' && request.method === 'GET') {
+        return new Response(indexHtml, {
+          headers: {
+            'Content-Type': 'text/html',
+          },
+        });
+      }
+
       if (url.pathname.startsWith('/chat') && request.method === 'POST') {
         const res = await handleChatPOST(request, env, userId);
         return withCors(res);
@@ -35,10 +44,6 @@ export default {
         const stub = env.CHAT_HISTORY.get(id);
         const res = await stub.fetch(request);
         return withCors(res);
-      }
-
-      if ((env as any).ASSETS) {
-        return (env as any).ASSETS.fetch(request);
       }
 
       return new Response('Not found', { status: 404 });

@@ -6,36 +6,18 @@ export async function getAIStream(
   message: string,
   summary?: string
 ) {
-  const stream = await ai.streamAIResponse(history, message, summary);
+  // Stream AI response
+  const streamResult = await ai.streamAIResponse(history, message, summary);
 
-  let fullText = '';
-  const { readable, writable } = new TransformStream();
-  const writer = writable.getWriter();
-  const encoder = new TextEncoder();
+  // Get the text promise BEFORE converting to response
+  const finalTextPromise = streamResult.text;
 
-  const finalTextPromise = (async () => {
-    try {
-      if (stream && typeof stream[Symbol.asyncIterator] === 'function') {
-        for await (const chunk of stream) {
-          const text = chunk?.response || chunk?.text || '';
-          if (text) {
-            fullText += text;
-            await writer.write(encoder.encode(text));
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Stream error:', error);
-    } finally {
-      await writer.close();
-    }
-    return fullText;
-  })();
-
-  const streamResponse = new Response(readable, {
+  // Convert to streaming Response
+  const streamResponse = streamResult.toTextStreamResponse({
     headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-      'Transfer-Encoding': 'chunked',
+      'Content-Type': 'text/plain',
+      'transfer-encoding': 'chunked',
+      'content-encoding': 'identity',
     },
   });
 
