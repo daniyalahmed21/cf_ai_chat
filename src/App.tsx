@@ -74,9 +74,14 @@ function App() {
     setStreamingMessage('')
   }
 
+  const handleClearChat = () => {
+    setMessages([{ content: "Hello! I'm your AI assistant powered by Cloudflare Workers AI. How can I help you today?", isUser: false }])
+    localStorage.removeItem('chat_messages')
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
-      <ChatHeader />
+      <ChatHeader onClearChat={handleClearChat} />
 
       <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
         <div className="w-full max-w-5xl h-[calc(100vh-140px)] bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-200">
